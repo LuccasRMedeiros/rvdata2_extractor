@@ -1,0 +1,15 @@
+---
+description: CMake and build-script discipline
+globs: "**/CMakeLists.txt,**/*.cmake"
+alwaysApply: false
+---
+
+# CMake / build files
+
+Follow the Build-file discipline section in [`AGENTS.md`](../../AGENTS.md).
+
+Reminders:
+
+- Edit build files carefully; prefer focused `*.cmake` modules loaded when needed
+- Any build-script change must update `CHANGELOG.md` with clear what/why for human reviewers
+- Keep the project buildable with GNU build essentials + CMake, targeting C++17

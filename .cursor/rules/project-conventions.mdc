@@ -1,0 +1,12 @@
+---
+description: Core project boundaries and conventions for rvdata2_extractor
+alwaysApply: true
+---
+
+# Project conventions
+
+This repo is an **rvdata2 extractor/compressor** (C++17, POSIX, CMake, GNU build essentials, cross-platform).
+
+**Source of truth:** read and follow [`AGENTS.md`](../../AGENTS.md) for all coding, layout, brace style, globals/resource ownership, and build-file rules.
+
+Do not invent parallel conventions. Prefer staying within extract/compress tooling scope unless the user asks otherwise.

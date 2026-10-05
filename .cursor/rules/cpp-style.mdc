@@ -1,0 +1,21 @@
+---
+description: C++ header/source layout and brace style
+globs: "**/*.{cpp,hpp}"
+alwaysApply: false
+---
+
+# C++ style
+
+Follow the Header / Source / Brace / Variable declarations sections in [`AGENTS.md`](../../AGENTS.md).
+
+Reminders:
+
+- `.hpp` for headers, `.cpp` for sources; definitions in headers, implementations in sources
+- Header order: guards → includes → macros → types → free functions → classes → justified namespaces
+- Do not wrap a lone free function or class in a named namespace; namespaces need a real multi-symbol/collision purpose (see `AGENTS.md`)
+- Helpers (one-site / file-local) must live in an anonymous namespace; actual/reusable functions need abstract params or a repeating pattern — do not promote helpers to headers on speculation (see `AGENTS.md`)
+- No passthrough wrappers: same parameter count/types forwarded unchanged is just a rename; wrappers must process or derive arguments (see `AGENTS.md`)
+- Declare variables at the start of their scope (prefer function scope; branch/loop OK if local-only); blank line after the declaration block (see `AGENTS.md`)
+- Every `#endif` needs a condition comment
+- Same-line `{` for namespace/class/function; next-line `{` for conditions/loops
+- Do not `using` a namespace you are implementing; avoid globals unless the user asks

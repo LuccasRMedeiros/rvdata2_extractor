@@ -1,0 +1,7 @@
+.ccls-cache
+.vscode
+build
+Scripts
+compile_commands.json
+rvdata2_extractor*
+*.rvdata2

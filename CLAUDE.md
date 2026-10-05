@@ -1,0 +1,7 @@
+# Claude Code instructions
+
+This repository is an **rvdata2 extractor/compressor** written in C++17 (POSIX, CMake, GNU build essentials, cross-platform).
+
+**Follow [`AGENTS.md`](AGENTS.md) as the source of truth** for project boundaries, build-file discipline, header/source layout, brace style, `#endif` comments, and resource/globals policy.
+
+Do not duplicate or diverge from those rules here.
