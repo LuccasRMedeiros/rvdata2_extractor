@@ -143,6 +143,64 @@ A thin adapter that only renames, reorders without semantic change, or re-export
 
 For review or removal of passthrough wrappers (including when the user names a specific function), use [`.cursor/skills/passthrough-wrappers/SKILL.md`](.cursor/skills/passthrough-wrappers/SKILL.md).
 
+### Verifiers (no equality renames)
+
+Do **not** add a function or method whose body only checks whether a value equals (or differs from) an expected value and returns that bool. That is just another name for `==` / `!=` and adds call-stack noise without useful abstraction.
+
+Forbidden (trivial verifier / equality rename), assuming a public discriminant the caller can already read:
+
+```cpp
+bool is_array(void) const
+{
+    return type == Type::Array;
+}
+
+bool verify_version(int version)
+{
+    return version == 4;
+}
+```
+
+Compare at the call site instead:
+
+```cpp
+if (root.type != Type::Array)
+{
+    // ...
+}
+
+if (version != 4)
+{
+    // ...
+}
+```
+
+Names such as `is_*`, `verify_*`, `check_*`, or `expect_*` do not make the pattern acceptable when the body is still only equality.
+
+Allowed only when the predicate has **real** logic beyond a single comparison — multiple conditions, range/set checks, parsing, normalization, throwing on invalid state as part of a typed accessor, or other non-trivial work:
+
+```cpp
+bool is_path_hostile(unsigned char ch)
+{
+    if (ch < 0x20)
+    {
+        return true;
+    }
+    switch (ch)
+    {
+        case '/':
+        case '\\':
+        case ':':
+            return true;
+        default:
+            return false;
+    }
+}
+```
+Type-tag or enum façade methods over a public member the caller can compare directly (e.g. `is_nil`, `is_bool`, `is_integer`, `is_string`, `is_symbol`, `is_array`) are forbidden.
+
+For review or removal of trivial verifiers (including when the user names a specific function), use [`.cursor/skills/trivial-verifiers/SKILL.md`](.cursor/skills/trivial-verifiers/SKILL.md).
+
 ### `#endif` comments (obligatory)
 
 Whenever you close `#ifdef MACRO`, `#ifndef MACRO`, or `#if (EXPR)` with `#endif`, the `#endif` **must** be followed by a comment naming the condition being closed:
@@ -304,6 +362,7 @@ Before finishing a change, confirm:
 - [ ] Named namespaces exist only when they have a clear multi-symbol / collision purpose
 - [ ] Helpers vs actual functions are classified correctly; helpers are in anonymous namespaces; actual functions are only promoted when reuse/pattern warrants it
 - [ ] No passthrough wrappers (same parameter count/types forwarded unchanged); wrappers must process or derive arguments
+- [ ] No trivial verifiers (functions that only return whether a value equals an expected value); compare at the call site
 - [ ] Every `#endif` has a condition comment
 - [ ] Brace style matches the table above
 - [ ] Variables are declared at the start of their scope with a blank line after the declaration block

@@ -1,8 +1,10 @@
 #include "fs_util.hpp"
 
+#include <filesystem>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <system_error>
 
 namespace {
 	bool is_path_hostile(unsigned char ch)
@@ -31,37 +33,32 @@ namespace {
 
 std::vector<uint8_t> read_file(const std::string &path)
 {
+	std::ostringstream oss;
 	std::ifstream input(path, std::ios::binary);
-	std::streamoff size;
+	std::error_code ec;
+	std::uintmax_t size;
 	std::vector<uint8_t> data;
 
 	if (!input)
 	{
-		std::ostringstream oss;
-
 		oss << "Failed to open input file: " << path;
 		throw std::runtime_error(oss.str());
 	}
 
-	input.seekg(0, std::ios::end);
-	size = input.tellg();
-	if (size < 0)
+	size = std::filesystem::file_size(path, ec);
+	if (ec)
 	{
-		std::ostringstream oss;
-
 		oss << "Failed to determine size of input file: " << path;
 		throw std::runtime_error(oss.str());
 	}
-	input.seekg(0, std::ios::beg);
 
 	data.resize(static_cast<size_t>(size));
 	if (size > 0)
 	{
-		input.read(reinterpret_cast<char *>(data.data()), size);
+		input.read(reinterpret_cast<char *>(data.data()),
+			static_cast<std::streamsize>(size));
 		if (!input)
 		{
-			std::ostringstream oss;
-
 			oss << "Failed to read input file: " << path;
 			throw std::runtime_error(oss.str());
 		}
@@ -71,20 +68,17 @@ std::vector<uint8_t> read_file(const std::string &path)
 
 void write_file(const std::string &path, const std::string &data)
 {
+	std::ostringstream oss;
 	std::ofstream output(path, std::ios::binary | std::ios::trunc);
 
 	if (!output)
 	{
-		std::ostringstream oss;
-
 		oss << "Failed to open output file: " << path;
 		throw std::runtime_error(oss.str());
 	}
 	output.write(data.data(), static_cast<std::streamsize>(data.size()));
 	if (!output)
 	{
-		std::ostringstream oss;
-
 		oss << "Failed to write output file: " << path;
 		throw std::runtime_error(oss.str());
 	}

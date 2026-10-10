@@ -3,16 +3,17 @@ name: helper-vs-actual
 description: >-
   Classify C++ free functions as helpers or actual/reusable APIs, then review or
   refactor placement (anonymous namespace vs header/source). Also flags
-  passthrough wrappers during function review. Use when the user asks to review
-  helpers, promote/demote functions, audit reuse, refactor file-local helpers,
-  or names a specific function to classify or move.
+  passthrough wrappers and trivial equality verifiers during function review.
+  Use when the user asks to review helpers, promote/demote functions, audit
+  reuse, refactor file-local helpers, or names a specific function to classify
+  or move.
 ---
 
 # Helper vs actual function review
 
-Normative definitions live in [`AGENTS.md`](../../../AGENTS.md) under **Helper vs actual functions**, **Namespaces**, **Wrappers**, and **Variable declarations**. Do not invent parallel rules; apply those.
+Normative definitions live in [`AGENTS.md`](../../../AGENTS.md) under **Helper vs actual functions**, **Namespaces**, **Wrappers**, **Verifiers**, and **Variable declarations**. Do not invent parallel rules; apply those.
 
-Related skills: [passthrough-wrappers](../passthrough-wrappers/SKILL.md), [variable-declarations](../variable-declarations/SKILL.md).
+Related skills: [passthrough-wrappers](../passthrough-wrappers/SKILL.md), [trivial-verifiers](../trivial-verifiers/SKILL.md), [variable-declarations](../variable-declarations/SKILL.md).
 
 ## Scope modes
 
@@ -31,7 +32,8 @@ For each candidate function:
 - [ ] Are parameters abstract/agnostic, or tied to one surrounding procedure?
 - [ ] Does the same procedure or pattern already repeat elsewhere?
 - [ ] Is it a **passthrough wrapper** (same parameter count/types forwarded unchanged to another function with no processing)? If yes, verdict is remove/inline — not “helper” or “actual”
-- [ ] Verdict: **helper**, **actual**, or **passthrough wrapper** (cite evidence)
+- [ ] Is it a **trivial verifier** (body only returns whether a value equals/differs from an expected value)? If yes, verdict is remove/inline — not “helper” or “actual”. See [trivial-verifiers](../trivial-verifiers/SKILL.md)
+- [ ] Verdict: **helper**, **actual**, **passthrough wrapper**, or **trivial verifier** (cite evidence)
 
 ### Verdicts and required placement
 
@@ -41,15 +43,16 @@ For each candidate function:
 | Actual (module API) | Declared in the appropriate `.hpp`, implemented in `.cpp`; no pointless wrapping named namespace |
 | Actual (extract from duplication) | Factor once with abstract parameters; update call sites; keep true one-off leftovers as helpers |
 | Passthrough wrapper | Remove; call the target directly (or rename the target). See **Wrappers** in `AGENTS.md` |
+| Trivial verifier | Remove; compare at the call site. See **Verifiers** in `AGENTS.md` |
 
-Do **not** promote a helper to a header on speculation. Do **not** leave a clearly repeated agnostic pattern copy-pasted when it should become an actual function. Do **not** keep rename-only wrappers.
+Do **not** promote a helper to a header on speculation. Do **not** leave a clearly repeated agnostic pattern copy-pasted when it should become an actual function. Do **not** keep rename-only wrappers or equality-only verifiers.
 
 ## Workflow
 
-1. Read the relevant **Helper vs actual** / **Namespaces** / **Wrappers** sections in `AGENTS.md`.
+1. Read the relevant **Helper vs actual** / **Namespaces** / **Wrappers** / **Verifiers** sections in `AGENTS.md`.
 2. Resolve scope (named function vs file vs broader).
 3. Gather evidence: definitions, declarations, call sites (`rg` / project search).
-4. Classify with the checklist; note misplacements (bare file-scope helper, helper in header, actual buried as anonymous with external need, duplicated pattern not factored, passthrough wrappers).
+4. Classify with the checklist; note misplacements (bare file-scope helper, helper in header, actual buried as anonymous with external need, duplicated pattern not factored, passthrough wrappers, trivial verifiers).
 5. **If review only:** report findings (see output format). Do not edit.
 6. **If refactor requested:** apply the smallest placement/API change that matches the verdicts; keep brace/style/`#endif`/variable-declaration rules from `AGENTS.md`; rebuild or compile if the project already has a build.
 7. Summarize what changed and what was left alone (and why).
@@ -63,7 +66,7 @@ Do **not** promote a helper to a header on speculation. Do **not** leave a clear
 ## Findings
 | Symbol | Current placement | Verdict | Evidence | Action |
 |--------|-------------------|---------|----------|--------|
-| ... | anonymous / header / bare file scope | helper / actual / passthrough | call sites, params, repetition, forward shape | keep / move / promote / demote / factor / remove |
+| ... | anonymous / header / bare file scope | helper / actual / passthrough / trivial verifier | call sites, params, repetition, forward shape, equality-only body | keep / move / promote / demote / factor / remove |
 
 ## Changes
 - [what was edited, or "review only — no edits"]
@@ -78,5 +81,5 @@ When the user asks about one function:
 
 1. Locate its definition and any header declaration.
 2. List all call sites.
-3. Classify that symbol first (including passthrough check); only mention neighbors if they block a correct move.
-4. If they asked “should this be public?”, answer with helper vs actual evidence, not taste. If it is only a rename of another function, say so and recommend removal.
+3. Classify that symbol first (including passthrough and trivial-verifier checks); only mention neighbors if they block a correct move.
+4. If they asked “should this be public?”, answer with helper vs actual evidence, not taste. If it is only a rename of another function or an equality-only verifier, say so and recommend removal.

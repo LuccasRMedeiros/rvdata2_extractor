@@ -276,39 +276,9 @@ marshal::Value marshal::Value::make_array(const std::vector<Value> &value)
 	return out;
 }
 
-bool marshal::Value::is_nil(void) const
-{
-	return type == Type::Nil;
-}
-
-bool marshal::Value::is_bool(void) const
-{
-	return type == Type::Bool;
-}
-
-bool marshal::Value::is_integer(void) const
-{
-	return type == Type::Integer;
-}
-
-bool marshal::Value::is_string(void) const
-{
-	return type == Type::String;
-}
-
-bool marshal::Value::is_symbol(void) const
-{
-	return type == Type::Symbol;
-}
-
-bool marshal::Value::is_array(void) const
-{
-	return type == Type::Array;
-}
-
 int64_t marshal::Value::as_integer(void) const
 {
-	if (!is_integer())
+	if (type != Type::Integer)
 	{
 		throw Error("Marshal value is not an integer");
 	}
@@ -317,7 +287,7 @@ int64_t marshal::Value::as_integer(void) const
 
 const std::string &marshal::Value::as_string(void) const
 {
-	if (!is_string() && !is_symbol())
+	if (type != Type::String && type != Type::Symbol)
 	{
 		throw Error("Marshal value is not a string");
 	}
@@ -326,7 +296,7 @@ const std::string &marshal::Value::as_string(void) const
 
 const std::vector<marshal::Value> &marshal::Value::as_array(void) const
 {
-	if (!is_array())
+	if (type != Type::Array)
 	{
 		throw Error("Marshal value is not an array");
 	}

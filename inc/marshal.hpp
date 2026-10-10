@@ -38,13 +38,6 @@ namespace marshal {
 			static Value make_symbol(const std::string &value);
 			static Value make_array(const std::vector<Value> &value);
 
-			bool is_nil(void) const;
-			bool is_bool(void) const;
-			bool is_integer(void) const;
-			bool is_string(void) const;
-			bool is_symbol(void) const;
-			bool is_array(void) const;
-
 			int64_t as_integer(void) const;
 			const std::string &as_string(void) const;
 			const std::vector<Value> &as_array(void) const;

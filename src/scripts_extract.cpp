@@ -62,7 +62,7 @@ size_t scripts_extract(const std::string &input_path, const std::string &output_
 	const marshal::Value root = marshal::load(data);
 	size_t written = 0;
 
-	if (!root.is_array())
+	if (root.type != marshal::Type::Array)
 	{
 		throw std::runtime_error("Scripts.rvdata2 root object is not an array");
 	}
@@ -81,7 +81,7 @@ size_t scripts_extract(const std::string &input_path, const std::string &output_
 			std::string filename;
 			std::string path;
 
-			if (!entry.is_array())
+			if (entry.type != marshal::Type::Array)
 			{
 				std::ostringstream oss;
 
@@ -100,7 +100,7 @@ size_t scripts_extract(const std::string &input_path, const std::string &output_
 					throw std::runtime_error(oss.str());
 				}
 
-				if (!fields[0].is_integer())
+				if (fields[0].type != marshal::Type::Integer)
 				{
 					std::ostringstream oss;
 
@@ -108,7 +108,7 @@ size_t scripts_extract(const std::string &input_path, const std::string &output_
 					throw std::runtime_error(oss.str());
 				}
 
-				if (!fields[1].is_string())
+				if (fields[1].type != marshal::Type::String)
 				{
 					std::ostringstream oss;
 
@@ -116,7 +116,7 @@ size_t scripts_extract(const std::string &input_path, const std::string &output_
 					throw std::runtime_error(oss.str());
 				}
 
-				if (!fields[2].is_string())
+				if (fields[2].type != marshal::Type::String)
 				{
 					std::ostringstream oss;
 

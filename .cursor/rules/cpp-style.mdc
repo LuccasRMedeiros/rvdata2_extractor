@@ -15,6 +15,7 @@ Reminders:
 - Do not wrap a lone free function or class in a named namespace; namespaces need a real multi-symbol/collision purpose (see `AGENTS.md`)
 - Helpers (one-site / file-local) must live in an anonymous namespace; actual/reusable functions need abstract params or a repeating pattern — do not promote helpers to headers on speculation (see `AGENTS.md`)
 - No passthrough wrappers: same parameter count/types forwarded unchanged is just a rename; wrappers must process or derive arguments (see `AGENTS.md`)
+- No trivial verifiers: functions that only return whether a value equals an expected value are forbidden; compare at the call site (see `AGENTS.md`)
 - Declare variables at the start of their scope (prefer function scope; branch/loop OK if local-only); blank line after the declaration block (see `AGENTS.md`)
 - Every `#endif` needs a condition comment
 - Same-line `{` for namespace/class/function; next-line `{` for conditions/loops
