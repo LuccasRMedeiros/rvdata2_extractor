@@ -8,7 +8,7 @@ int main(void)
 	{
 		const size_t count = scripts_extract("Scripts.rvdata2", "Scripts");
 
-		std::cout << "Extracted " << count << " scripts into Scripts/" << std::endl;
+		std::cout << "Extracted " << count << " scripts into Scripts/ and wrote Scripts/scripts.tree" << std::endl;
 		return 0;
 	}
 	catch (const std::exception &ex)

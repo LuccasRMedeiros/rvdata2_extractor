@@ -7,12 +7,8 @@
 #include <system_error>
 
 namespace {
-	bool is_path_hostile(unsigned char ch)
+	bool is_invalid_chr(unsigned char ch)
 	{
-		if (ch < 0x20)
-		{
-			return true;
-		}
 		switch (ch)
 		{
 			case '/':
@@ -87,32 +83,27 @@ void write_file(const std::string &path, const std::string &data)
 std::string sanitize_filename(const std::string &name)
 {
 	std::string cleaned;
+	size_t begin;
+	size_t end;
 
-	cleaned.reserve(name.size());
-	for (unsigned char ch : name)
+	begin = name.find_first_not_of(' ');
+	end = name.find_last_not_of(" .");
+	if (end == std::string::npos)
 	{
-		if (is_path_hostile(ch))
-		{
-			cleaned.push_back('_');
-		}
-		else
+		return "Untitled";
+	}
+	cleaned.reserve(end - begin + 1);
+	for (unsigned char ch : name.substr(begin, end - begin + 1))
+	{
+		if (!is_invalid_chr(ch) && !isspace(ch))
 		{
 			cleaned.push_back(static_cast<char>(ch));
 		}
-	}
-
-	while (!cleaned.empty())
-	{
-		const char last = cleaned.back();
-
-		if (last == ' ' || last == '.')
+		else if (isspace(ch))
 		{
-			cleaned.pop_back();
-			continue;
+			cleaned.push_back('_');
 		}
-		break;
 	}
-
 	if (cleaned.empty())
 	{
 		return "Untitled";
